@@ -65,10 +65,10 @@ RecurringJob.AddOrUpdate<CreditCheckJob>(
     methodCall: job => job.RunAsync(),
     cronExpression: Cron.Daily(hour: 8));
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbCtx = scope.ServiceProvider.GetRequiredService<RouteOpsDbContext>();
-    await dbCtx.Database.MigrateAsync();
-}
+// using (var scope = app.Services.CreateScope())
+// {
+//     var dbCtx = scope.ServiceProvider.GetRequiredService<RouteOpsDbContext>();
+//     await dbCtx.Database.MigrateAsync();
+// }
 
 app.Run();
