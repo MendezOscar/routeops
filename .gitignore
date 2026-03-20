@@ -1,0 +1,29 @@
+## .NET / ASP.NET Core
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.swp
+
+## Secretos — NUNCA subir al repo
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/appsettings.*.json
+!**/appsettings.json
+
+## EF Core — las migraciones SÍ se suben, solo ignorar snapshots temporales
+# **/Migrations/   <-- NO ignorar esto, Railway las necesita
+
+## Paquetes NuGet (se restauran en build)
+**/packages/
+*.nupkg
+
+## Logs
+*.log
+logs/
+
+## OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,11 @@
+RouteOps.sln
+│
+├── src/
+│   ├── RouteOps.Domain/               # Entidades, enums, value objects — sin dependencias externas
+│   ├── RouteOps.Application/          # Lógica de negocio (CQRS con MediatR)
+│   ├── RouteOps.Infrastructure/       # EF Core, PostgreSQL, servicios externos
+│   └── RouteOps.API/                  # ASP.NET Core Web API — punto de entrada
+│
+└── tests/
+    ├── RouteOps.UnitTests/
+    └── RouteOps.IntegrationTests/
