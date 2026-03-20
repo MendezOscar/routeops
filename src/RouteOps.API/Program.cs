@@ -56,6 +56,9 @@ if (app.Environment.IsDevelopment())
     app.UseCors("dev");
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseMiddleware<RouteOps.API.Middleware.ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
