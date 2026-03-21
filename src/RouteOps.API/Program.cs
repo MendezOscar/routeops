@@ -56,8 +56,7 @@ var jwtKey = builder.Configuration["Jwt:Key"]
 // ── Base de datos ─────────────────────────────────────────────
 builder.Services.AddDbContext<RouteOpsDbContext>(opt =>
     opt.UseNpgsql(conn, npg =>
-        npg.MigrationsAssembly("RouteOps.Infrastructure"))
-       .UseSnakeCaseNamingConvention());
+        npg.MigrationsAssembly("RouteOps.Infrastructure")));
 
 builder.Services.AddScoped<IRouteOpsDbContext>(sp =>
     sp.GetRequiredService<RouteOpsDbContext>());

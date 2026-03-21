@@ -11,13 +11,36 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
     {
         b.ToTable("clients");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Name).HasMaxLength(150).IsRequired();
-        b.Property(x => x.Phone).HasMaxLength(30);
-        b.Property(x => x.Email).HasMaxLength(150);
-        b.Property(x => x.CreditLimit).HasPrecision(12, 2);
-        b.Property(x => x.Zone).HasMaxLength(80);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.Name).HasColumnName("name").HasMaxLength(150).IsRequired();
+        b.Property(x => x.Phone).HasColumnName("phone").HasMaxLength(30);
+        b.Property(x => x.Email).HasColumnName("email").HasMaxLength(150);
+        b.Property(x => x.Address).HasColumnName("address");
+        b.Property(x => x.Zone).HasColumnName("zone").HasMaxLength(80);
+        b.Property(x => x.CreditLimit).HasColumnName("credit_limit").HasPrecision(12, 2);
+        b.Property(x => x.CreditDays).HasColumnName("credit_days");
+        b.Property(x => x.Active).HasColumnName("active");
+        b.Property(x => x.Notes).HasColumnName("notes");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
+        b.Property(x => x.UpdatedAt).HasColumnName("updated_at");
         b.HasMany(x => x.Orders).WithOne(o => o.Client).HasForeignKey(o => o.ClientId);
         b.HasMany(x => x.Credits).WithOne(c => c.Client).HasForeignKey(c => c.ClientId);
+    }
+}
+
+public class DriverConfiguration : IEntityTypeConfiguration<Driver>
+{
+    public void Configure(EntityTypeBuilder<Driver> b)
+    {
+        b.ToTable("drivers");
+        b.HasKey(x => x.Id);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.Name).HasColumnName("name").HasMaxLength(120).IsRequired();
+        b.Property(x => x.Phone).HasColumnName("phone").HasMaxLength(30);
+        b.Property(x => x.ColorHex).HasColumnName("color_hex").HasMaxLength(7);
+        b.Property(x => x.Active).HasColumnName("active");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
+        b.Property(x => x.UpdatedAt).HasColumnName("updated_at");
     }
 }
 
@@ -27,13 +50,22 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
     {
         b.ToTable("orders");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Status).HasConversion<string>();
-        b.Property(x => x.Subtotal).HasPrecision(12, 2);
-        b.Property(x => x.Iva).HasPrecision(12, 2);
-        b.Property(x => x.Total).HasPrecision(12, 2);
-        b.Property(x => x.WeightKg).HasPrecision(8, 3);
-        b.Property(x => x.Lat).HasPrecision(10, 7);
-        b.Property(x => x.Lng).HasPrecision(10, 7);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.ClientId).HasColumnName("client_id");
+        b.Property(x => x.DriverId).HasColumnName("driver_id");
+        b.Property(x => x.Status).HasConversion<string>().HasColumnName("status");
+        b.Property(x => x.Subtotal).HasColumnName("subtotal").HasPrecision(12, 2);
+        b.Property(x => x.Iva).HasColumnName("iva").HasPrecision(12, 2);
+        b.Property(x => x.Total).HasColumnName("total").HasPrecision(12, 2);
+        b.Property(x => x.WeightKg).HasColumnName("weight_kg").HasPrecision(8, 3);
+        b.Property(x => x.Address).HasColumnName("address");
+        b.Property(x => x.Zone).HasColumnName("zone").HasMaxLength(80);
+        b.Property(x => x.Lat).HasColumnName("lat").HasPrecision(10, 7);
+        b.Property(x => x.Lng).HasColumnName("lng").HasPrecision(10, 7);
+        b.Property(x => x.Notes).HasColumnName("notes");
+        b.Property(x => x.RejectedReason).HasColumnName("rejected_reason");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
+        b.Property(x => x.UpdatedAt).HasColumnName("updated_at");
         b.HasMany(x => x.Items).WithOne().HasForeignKey(i => i.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
         b.HasOne(x => x.Sale).WithOne(s => s.Order)
@@ -47,8 +79,12 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
     {
         b.ToTable("order_items");
         b.HasKey(x => x.Id);
-        b.Property(x => x.UnitPrice).HasPrecision(12, 2);
-        b.Property(x => x.WeightKg).HasPrecision(8, 3);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.OrderId).HasColumnName("order_id");
+        b.Property(x => x.ProductId).HasColumnName("product_id");
+        b.Property(x => x.Quantity).HasColumnName("quantity");
+        b.Property(x => x.UnitPrice).HasColumnName("unit_price").HasPrecision(12, 2);
+        b.Property(x => x.WeightKg).HasColumnName("weight_kg").HasPrecision(8, 3);
         b.Ignore(x => x.Subtotal);
     }
 }
@@ -59,11 +95,19 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         b.ToTable("products");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Name).HasMaxLength(150).IsRequired();
-        b.Property(x => x.Sku).HasMaxLength(60).IsRequired();
-        b.Property(x => x.Price).HasPrecision(12, 2);
-        b.Property(x => x.Cost).HasPrecision(12, 2);
-        b.Property(x => x.WeightKg).HasPrecision(6, 3);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.CategoryId).HasColumnName("category_id");
+        b.Property(x => x.Name).HasColumnName("name").HasMaxLength(150).IsRequired();
+        b.Property(x => x.Sku).HasColumnName("sku").HasMaxLength(60).IsRequired();
+        b.Property(x => x.Price).HasColumnName("price").HasPrecision(12, 2);
+        b.Property(x => x.Cost).HasColumnName("cost").HasPrecision(12, 2);
+        b.Property(x => x.WeightKg).HasColumnName("weight_kg").HasPrecision(6, 3);
+        b.Property(x => x.Stock).HasColumnName("stock");
+        b.Property(x => x.MinStock).HasColumnName("min_stock");
+        b.Property(x => x.Icon).HasColumnName("icon");
+        b.Property(x => x.Active).HasColumnName("active");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
+        b.Property(x => x.UpdatedAt).HasColumnName("updated_at");
         b.HasIndex(x => x.Sku).IsUnique();
         b.Ignore(x => x.MarginPercent);
         b.Ignore(x => x.IsLowStock);
@@ -77,10 +121,15 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
     {
         b.ToTable("sales");
         b.HasKey(x => x.Id);
-        b.Property(x => x.PayMethod).HasConversion<string>();
-        b.Property(x => x.Subtotal).HasPrecision(12, 2);
-        b.Property(x => x.Iva).HasPrecision(12, 2);
-        b.Property(x => x.Total).HasPrecision(12, 2);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.OrderId).HasColumnName("order_id");
+        b.Property(x => x.ClientId).HasColumnName("client_id");
+        b.Property(x => x.PayMethod).HasConversion<string>().HasColumnName("pay_method");
+        b.Property(x => x.Subtotal).HasColumnName("subtotal").HasPrecision(12, 2);
+        b.Property(x => x.Iva).HasColumnName("iva").HasPrecision(12, 2);
+        b.Property(x => x.Total).HasColumnName("total").HasPrecision(12, 2);
+        b.Property(x => x.Notes).HasColumnName("notes");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
     }
 }
 
@@ -90,12 +139,17 @@ public class CreditConfiguration : IEntityTypeConfiguration<Credit>
     {
         b.ToTable("credits");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Total).HasPrecision(12, 2);
-        b.Property(x => x.Balance).HasPrecision(12, 2);
-        b.Property(x => x.Status).HasConversion<string>();
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.SaleId).HasColumnName("sale_id");
+        b.Property(x => x.ClientId).HasColumnName("client_id");
+        b.Property(x => x.Total).HasColumnName("total").HasPrecision(12, 2);
+        b.Property(x => x.Balance).HasColumnName("balance").HasPrecision(12, 2);
+        b.Property(x => x.DueDate).HasColumnName("due_date");
+        b.Property(x => x.Status).HasConversion<string>().HasColumnName("status");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
+        b.Property(x => x.UpdatedAt).HasColumnName("updated_at");
         b.HasMany(x => x.Payments).WithOne().HasForeignKey(p => p.CreditId)
             .OnDelete(DeleteBehavior.Cascade);
-        b.HasIndex(x => x.DueDate).HasFilter("balance > 0");
         b.Ignore(x => x.DaysUntilDue);
         b.Ignore(x => x.IsOverdue);
         b.Ignore(x => x.IsDueSoon);
@@ -108,20 +162,13 @@ public class CreditPaymentConfiguration : IEntityTypeConfiguration<CreditPayment
     {
         b.ToTable("credit_payments");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Amount).HasPrecision(12, 2);
-        b.Property(x => x.Method).HasMaxLength(40);
-        b.Property(x => x.Reference).HasMaxLength(150);
-    }
-}
-
-public class DriverConfiguration : IEntityTypeConfiguration<Driver>
-{
-    public void Configure(EntityTypeBuilder<Driver> b)
-    {
-        b.ToTable("drivers");
-        b.HasKey(x => x.Id);
-        b.Property(x => x.Name).HasMaxLength(120).IsRequired();
-        b.Property(x => x.ColorHex).HasMaxLength(7);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.CreditId).HasColumnName("credit_id");
+        b.Property(x => x.Amount).HasColumnName("amount").HasPrecision(12, 2);
+        b.Property(x => x.Method).HasColumnName("method").HasMaxLength(40);
+        b.Property(x => x.Reference).HasColumnName("reference").HasMaxLength(150);
+        b.Property(x => x.Notes).HasColumnName("notes");
+        b.Property(x => x.PaidAt).HasColumnName("paid_at");
     }
 }
 
@@ -131,9 +178,14 @@ public class InventoryMovementConfiguration : IEntityTypeConfiguration<Inventory
     {
         b.ToTable("inventory_movements");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Type).HasConversion<string>();
-        b.Property(x => x.Reason).HasMaxLength(80);
-        b.Property(x => x.Reference).HasMaxLength(80);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.ProductId).HasColumnName("product_id");
+        b.Property(x => x.Type).HasConversion<string>().HasColumnName("type");
+        b.Property(x => x.Quantity).HasColumnName("quantity");
+        b.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(80);
+        b.Property(x => x.Reference).HasColumnName("reference").HasMaxLength(80);
+        b.Property(x => x.Notes).HasColumnName("notes");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
     }
 }
 
@@ -143,9 +195,14 @@ public class PurchaseOrderConfiguration : IEntityTypeConfiguration<PurchaseOrder
     {
         b.ToTable("purchase_orders");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Supplier).HasMaxLength(150).IsRequired();
-        b.Property(x => x.Status).HasConversion<string>();
-        b.Property(x => x.Total).HasPrecision(12, 2);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.Supplier).HasColumnName("supplier").HasMaxLength(150).IsRequired();
+        b.Property(x => x.Status).HasConversion<string>().HasColumnName("status");
+        b.Property(x => x.Total).HasColumnName("total").HasPrecision(12, 2);
+        b.Property(x => x.Notes).HasColumnName("notes");
+        b.Property(x => x.ExpectedAt).HasColumnName("expected_at");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
+        b.Property(x => x.UpdatedAt).HasColumnName("updated_at");
         b.HasMany(x => x.Items).WithOne().HasForeignKey(i => i.PurchaseOrderId)
             .OnDelete(DeleteBehavior.Cascade);
     }
@@ -157,7 +214,12 @@ public class PurchaseItemConfiguration : IEntityTypeConfiguration<PurchaseItem>
     {
         b.ToTable("purchase_items");
         b.HasKey(x => x.Id);
-        b.Property(x => x.UnitCost).HasPrecision(12, 2);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.PurchaseOrderId).HasColumnName("purchase_order_id");
+        b.Property(x => x.ProductId).HasColumnName("product_id");
+        b.Property(x => x.Quantity).HasColumnName("quantity");
+        b.Property(x => x.UnitCost).HasColumnName("unit_cost").HasPrecision(12, 2);
+        b.Property(x => x.ReceivedQty).HasColumnName("received_qty");
         b.Ignore(x => x.Subtotal);
     }
 }
@@ -168,8 +230,35 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
     {
         b.ToTable("notifications");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Type).HasConversion<string>();
-        b.Property(x => x.Channel).HasConversion<string>();
-        b.HasIndex(x => x.ScheduledAt).HasFilter("sent = false");
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.ClientId).HasColumnName("client_id");
+        b.Property(x => x.CreditId).HasColumnName("credit_id");
+        b.Property(x => x.OrderId).HasColumnName("order_id");
+        b.Property(x => x.Type).HasConversion<string>().HasColumnName("type");
+        b.Property(x => x.Channel).HasConversion<string>().HasColumnName("channel");
+        b.Property(x => x.Message).HasColumnName("message");
+        b.Property(x => x.Sent).HasColumnName("sent");
+        b.Property(x => x.ScheduledAt).HasColumnName("scheduled_at");
+        b.Property(x => x.SentAt).HasColumnName("sent_at");
+        b.Property(x => x.Error).HasColumnName("error");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
+    }
+}
+
+public class UserConfiguration : IEntityTypeConfiguration<User>
+{
+    public void Configure(EntityTypeBuilder<User> b)
+    {
+        b.ToTable("users");
+        b.HasKey(x => x.Id);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.Name).HasColumnName("name").HasMaxLength(150).IsRequired();
+        b.Property(x => x.Email).HasColumnName("email").HasMaxLength(150).IsRequired();
+        b.Property(x => x.PasswordHash).HasColumnName("password_hash").IsRequired();
+        b.Property(x => x.Role).HasColumnName("role").HasMaxLength(40);
+        b.Property(x => x.Active).HasColumnName("active");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
+        b.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+        b.HasIndex(x => x.Email).IsUnique();
     }
 }
