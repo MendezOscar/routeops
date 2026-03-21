@@ -45,7 +45,6 @@ public sealed class GetOrdersHandler(IRouteOpsDbContext db)
             Zone: o.Zone ?? o.Client.Zone ?? "",
             Status: o.Status.ToString(),
             Total: o.Total,
-            WeightKg: o.WeightKg,
             DriverName: o.Driver?.Name,
             Phone: o.Client.Phone,
             Notes: o.Notes,

@@ -18,7 +18,6 @@ public record OrderSummaryDto(
     string           Zone,
     string           Status,
     decimal          Total,
-    decimal          WeightKg,
     string?          DriverName,
     string?          Phone,
     string?          Notes,
