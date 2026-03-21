@@ -25,11 +25,6 @@ public class AuthController(IMediator mediator) : ControllerBase
             return Unauthorized(new { error = ex.Message });
         }
     }
-
-    // Temporal — eliminar después
-    [HttpGet("hash/{password}")]
-    public IActionResult Hash(string password) =>
-        Ok(new { hash = BCrypt.Net.BCrypt.HashPassword(password, 12) });
 }
 
 public record LoginRequest(string Email, string Password);
