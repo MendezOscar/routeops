@@ -17,6 +17,7 @@ public interface IRouteOpsDbContext
     DbSet<PurchaseOrder>       PurchaseOrders       { get; }
     DbSet<PurchaseItem>        PurchaseItems        { get; }
     DbSet<Notification>        Notifications        { get; }
+    DbSet<User> Users { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

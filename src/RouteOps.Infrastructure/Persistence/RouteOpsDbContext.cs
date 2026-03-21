@@ -19,6 +19,8 @@ public class RouteOpsDbContext(DbContextOptions<RouteOpsDbContext> options)
     public DbSet<PurchaseOrder>     PurchaseOrders     => Set<PurchaseOrder>();
     public DbSet<PurchaseItem>      PurchaseItems      => Set<PurchaseItem>();
     public DbSet<Notification>      Notifications      => Set<Notification>();
+    public DbSet<User> Users => Set<User>();
+
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
