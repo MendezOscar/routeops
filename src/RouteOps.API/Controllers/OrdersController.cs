@@ -53,6 +53,14 @@ public class OrdersController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new GetOrderByIdQuery(id), ct);
         return result is null ? NotFound() : Ok(result);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+    [FromQuery] string? status, CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetOrdersQuery(status), ct);
+        return Ok(result);
+    }
 }
 
 public record ApproveOrderRequest(Guid DriverId, PayMethod PayMethod);
