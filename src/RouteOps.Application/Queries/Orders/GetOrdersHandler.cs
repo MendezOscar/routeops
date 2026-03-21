@@ -9,30 +9,55 @@ public sealed class GetOrdersHandler(IRouteOpsDbContext db)
     : IRequestHandler<GetOrdersQuery, IReadOnlyList<OrderSummaryDto>>
 {
     public async Task<IReadOnlyList<OrderSummaryDto>> Handle(
-        GetOrdersQuery request, CancellationToken ct)
+     GetOrdersQuery request, CancellationToken ct)
     {
-        var query = db.Orders
-            .Include(o => o.Client)
-            .Include(o => o.Driver)
-            .Include(o => o.Items)
-            .AsQueryable();
+        var ordersQuery = db.Orders.AsQueryable();
 
         if (request.StatusFilter is not null &&
             Enum.TryParse<OrderStatus>(request.StatusFilter, true, out var status))
         {
-            query = query.Where(o => o.Status == status);
+            ordersQuery = ordersQuery.Where(o => o.Status == status);
         }
 
-        var orders = await query
+        // Sin Include — solo IDs y campos simples
+        var orders = await ordersQuery
             .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new
+            {
+                o.Id,
+                o.ClientId,
+                o.DriverId,
+                o.Status,
+                o.Total,
+                o.Address,
+                o.Zone,
+                o.Notes,
+                o.RejectedReason,
+                o.CreatedAt,
+            })
             .ToListAsync(ct);
 
-        // Cargar productos por separado para evitar conflicto de alias
-        var productIds = orders
-            .SelectMany(o => o.Items.Select(i => i.ProductId))
-            .Distinct()
-            .ToList();
+        if (!orders.Any()) return new List<OrderSummaryDto>();
 
+        // Cargar entidades relacionadas por separado
+        var clientIds = orders.Select(o => o.ClientId).Distinct().ToList();
+        var driverIds = orders.Select(o => o.DriverId).Where(d => d != null)
+            .Select(d => d!.Value).Distinct().ToList();
+        var orderIds = orders.Select(o => o.Id).ToList();
+
+        var clients = await db.Clients
+            .Where(c => clientIds.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id, ct);
+
+        var drivers = await db.Drivers
+            .Where(d => driverIds.Contains(d.Id))
+            .ToDictionaryAsync(d => d.Id, ct);
+
+        var items = await db.OrderItems
+            .Where(i => orderIds.Contains(i.OrderId))
+            .ToListAsync(ct);
+
+        var productIds = items.Select(i => i.ProductId).Distinct().ToList();
         var products = await db.Products
             .Where(p => productIds.Contains(p.Id))
             .ToDictionaryAsync(p => p.Id, ct);
@@ -40,23 +65,23 @@ public sealed class GetOrdersHandler(IRouteOpsDbContext db)
         return orders.Select(o => new OrderSummaryDto(
             Id: o.Id.ToString(),
             ClientId: o.ClientId.ToString(),
-            ClientName: o.Client.Name,
-            Address: o.Address ?? o.Client.Address ?? "",
-            Zone: o.Zone ?? o.Client.Zone ?? "",
+            ClientName: clients.TryGetValue(o.ClientId, out var c) ? c.Name : "",
+            Address: o.Address ?? (c?.Address ?? ""),
+            Zone: o.Zone ?? (c?.Zone ?? ""),
             Status: o.Status.ToString(),
             Total: o.Total,
-            DriverName: o.Driver?.Name,
-            Phone: o.Client.Phone,
+            DriverName: o.DriverId.HasValue && drivers.TryGetValue(o.DriverId.Value, out var d) ? d.Name : null,
+            Phone: c?.Phone,
             Notes: o.Notes,
             RejectedReason: o.RejectedReason,
             CreatedAt: o.CreatedAt,
-            Items: o.Items.Select(i =>
+            Items: items.Where(i => i.OrderId == o.Id).Select(i =>
             {
-                products.TryGetValue(i.ProductId, out var product);
+                products.TryGetValue(i.ProductId, out var p);
                 return new OrderItemDto(
                     ProductId: i.ProductId.ToString(),
-                    ProductName: product?.Name ?? "",
-                    ProductIcon: product?.Icon ?? "📦",
+                    ProductName: p?.Name ?? "",
+                    ProductIcon: p?.Icon ?? "📦",
                     Quantity: i.Quantity,
                     UnitPrice: i.UnitPrice
                 );
