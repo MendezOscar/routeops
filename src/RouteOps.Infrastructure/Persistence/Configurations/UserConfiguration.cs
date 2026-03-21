@@ -1,4 +1,3 @@
-// src/RouteOps.Infrastructure/Persistence/Configurations/UserConfiguration.cs
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RouteOps.Domain.Entities;
@@ -11,10 +10,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         b.ToTable("users");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Name).HasMaxLength(150).IsRequired();
-        b.Property(x => x.Email).HasMaxLength(150).IsRequired();
-        b.Property(x => x.PasswordHash).IsRequired();
-        b.Property(x => x.Role).HasMaxLength(40);
+        b.Property(x => x.Id).HasColumnName("id");
+        b.Property(x => x.Name).HasColumnName("name").HasMaxLength(150).IsRequired();
+        b.Property(x => x.Email).HasColumnName("email").HasMaxLength(150).IsRequired();
+        b.Property(x => x.PasswordHash).HasColumnName("password_hash").IsRequired();
+        b.Property(x => x.Role).HasColumnName("role").HasMaxLength(40);
+        b.Property(x => x.Active).HasColumnName("active");
+        b.Property(x => x.CreatedAt).HasColumnName("created_at");
+        b.Property(x => x.UpdatedAt).HasColumnName("updated_at");
         b.HasIndex(x => x.Email).IsUnique();
     }
 }
