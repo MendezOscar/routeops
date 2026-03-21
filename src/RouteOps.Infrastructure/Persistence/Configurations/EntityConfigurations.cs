@@ -53,8 +53,10 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         b.Property(x => x.Id).HasColumnName("id");
         b.Property(x => x.ClientId).HasColumnName("client_id");
         b.Property(x => x.DriverId).HasColumnName("driver_id");
-        b.Property(x => x.Status).HasConversion<string>().HasColumnName("status");
-        b.Property(x => x.Subtotal).HasColumnName("subtotal").HasPrecision(12, 2);
+        b.Property(x => x.Status)
+            .HasConversion(v => v.ToString().ToLower(),
+                           v => Enum.Parse<OrderStatus>(v, true))
+            .HasColumnName("status"); b.Property(x => x.Subtotal).HasColumnName("subtotal").HasPrecision(12, 2);
         b.Property(x => x.Iva).HasColumnName("iva").HasPrecision(12, 2);
         b.Property(x => x.Total).HasColumnName("total").HasPrecision(12, 2);
         b.Property(x => x.WeightKg).HasColumnName("weight_kg").HasPrecision(8, 3);
@@ -124,7 +126,10 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
         b.Property(x => x.Id).HasColumnName("id");
         b.Property(x => x.OrderId).HasColumnName("order_id");
         b.Property(x => x.ClientId).HasColumnName("client_id");
-        b.Property(x => x.PayMethod).HasConversion<string>().HasColumnName("pay_method");
+        b.Property(x => x.PayMethod)
+            .HasConversion(v => v.ToString().ToLower(),
+                        v => Enum.Parse<PayMethod>(v, true))
+            .HasColumnName("pay_method");
         b.Property(x => x.Subtotal).HasColumnName("subtotal").HasPrecision(12, 2);
         b.Property(x => x.Iva).HasColumnName("iva").HasPrecision(12, 2);
         b.Property(x => x.Total).HasColumnName("total").HasPrecision(12, 2);
@@ -145,7 +150,10 @@ public class CreditConfiguration : IEntityTypeConfiguration<Credit>
         b.Property(x => x.Total).HasColumnName("total").HasPrecision(12, 2);
         b.Property(x => x.Balance).HasColumnName("balance").HasPrecision(12, 2);
         b.Property(x => x.DueDate).HasColumnName("due_date");
-        b.Property(x => x.Status).HasConversion<string>().HasColumnName("status");
+        b.Property(x => x.Status)
+            .HasConversion(v => v.ToString().ToLower(),
+                        v => Enum.Parse<CreditStatus>(v, true))
+            .HasColumnName("status");
         b.Property(x => x.CreatedAt).HasColumnName("created_at");
         b.Property(x => x.UpdatedAt).HasColumnName("updated_at");
         b.HasMany(x => x.Payments).WithOne().HasForeignKey(p => p.CreditId)
@@ -180,7 +188,10 @@ public class InventoryMovementConfiguration : IEntityTypeConfiguration<Inventory
         b.HasKey(x => x.Id);
         b.Property(x => x.Id).HasColumnName("id");
         b.Property(x => x.ProductId).HasColumnName("product_id");
-        b.Property(x => x.Type).HasConversion<string>().HasColumnName("type");
+        b.Property(x => x.Type)
+            .HasConversion(v => v.ToString().ToLower(),
+                        v => Enum.Parse<MovementType>(v, true))
+            .HasColumnName("type");
         b.Property(x => x.Quantity).HasColumnName("quantity");
         b.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(80);
         b.Property(x => x.Reference).HasColumnName("reference").HasMaxLength(80);
@@ -197,7 +208,10 @@ public class PurchaseOrderConfiguration : IEntityTypeConfiguration<PurchaseOrder
         b.HasKey(x => x.Id);
         b.Property(x => x.Id).HasColumnName("id");
         b.Property(x => x.Supplier).HasColumnName("supplier").HasMaxLength(150).IsRequired();
-        b.Property(x => x.Status).HasConversion<string>().HasColumnName("status");
+        b.Property(x => x.Status)
+            .HasConversion(v => v.ToString().ToLower(),
+                        v => Enum.Parse<PurchaseOrderStatus>(v, true))
+            .HasColumnName("status");
         b.Property(x => x.Total).HasColumnName("total").HasPrecision(12, 2);
         b.Property(x => x.Notes).HasColumnName("notes");
         b.Property(x => x.ExpectedAt).HasColumnName("expected_at");
@@ -234,8 +248,14 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         b.Property(x => x.ClientId).HasColumnName("client_id");
         b.Property(x => x.CreditId).HasColumnName("credit_id");
         b.Property(x => x.OrderId).HasColumnName("order_id");
-        b.Property(x => x.Type).HasConversion<string>().HasColumnName("type");
-        b.Property(x => x.Channel).HasConversion<string>().HasColumnName("channel");
+        b.Property(x => x.Type)
+            .HasConversion(v => v.ToString().ToLower(),
+                        v => Enum.Parse<NotifType>(v, true))
+            .HasColumnName("type");
+        b.Property(x => x.Channel)
+            .HasConversion(v => v.ToString().ToLower(),
+                        v => Enum.Parse<NotifChannel>(v, true))
+            .HasColumnName("channel");
         b.Property(x => x.Message).HasColumnName("message");
         b.Property(x => x.Sent).HasColumnName("sent");
         b.Property(x => x.ScheduledAt).HasColumnName("scheduled_at");
