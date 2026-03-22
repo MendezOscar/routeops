@@ -86,7 +86,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
         b.Property(x => x.ProductId).HasColumnName("product_id");
         b.Property(x => x.Quantity).HasColumnName("quantity");
         b.Property(x => x.UnitPrice).HasColumnName("unit_price").HasPrecision(12, 2);
-        b.Property(x => x.WeightKg).HasColumnName("weight_kg").HasPrecision(8, 3);
+        b.Ignore(x => x.WeightKg);  
         b.Ignore(x => x.Subtotal);
     }
 }
