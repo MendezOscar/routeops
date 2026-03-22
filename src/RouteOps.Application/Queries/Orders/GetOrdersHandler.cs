@@ -34,6 +34,7 @@ public sealed class GetOrdersHandler(IRouteOpsDbContext db)
                 o.Notes,
                 o.RejectedReason,
                 o.CreatedAt,
+                o.WeightKg
             })
             .ToListAsync(ct);
 
@@ -75,6 +76,7 @@ public sealed class GetOrdersHandler(IRouteOpsDbContext db)
             Notes: o.Notes,
             RejectedReason: o.RejectedReason,
             CreatedAt: o.CreatedAt,
+            WeightKg: o.WeightKg,
             Items: items.Where(i => i.OrderId == o.Id).Select(i =>
             {
                 products.TryGetValue(i.ProductId, out var p);
